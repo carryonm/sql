@@ -1,7 +1,9 @@
 -- AGGREGATE
 /* 1. Write a query that determines how many times each vendor has rented a booth 
 at the farmer’s market by counting the vendor booth assignments per vendor_id. */
-
+SELECT count (booth_number * market_date)
+FROM vendor_booth_assignments
+GROUP BY vendor_id
 
 
 /* 2. The Farmer’s Market Customer Appreciation Committee wants to give a bumper 
@@ -10,6 +12,14 @@ of customers for them to give stickers to, sorted by last name, then first name.
 
 HINT: This query requires you to join two tables, use an aggregate function, and use the HAVING keyword. */
 
+SELECT customer.customer_last_name, customer.customer_first_name, 
+    sum(cp.quantity * cp.cost_to_customer_per_qty) AS spending
+FROM customer_purchases AS cp 
+LEFT JOIN customer 
+ON cp.customer_id = customer.customer_id
+GROUP BY cp.customer_id 
+HAVING spending > 2000
+ORDER BY spending DESC
 
 
 --Temp Table
@@ -23,7 +33,15 @@ When inserting the new vendor, you need to appropriately align the columns to be
 -> To insert the new row use VALUES, specifying the value you want for each column:
 VALUES(col1,col2,col3,col4,col5) 
 */
-
+DROP TABLE if EXISTS temp.new_vendor;
+-- step 1
+CREATE TABLE temp.new_vendor AS
+SELECT * FROM vendor;
+-- step 2
+INSERT INTO new_vendor
+VALUES (10,'Thomass Superfood Store','Fresh Focused','Thomas','Rosenthal');
+-- step 3 to check
+SELECT * from new_vendor;
 
 
 -- Date
@@ -31,6 +49,8 @@ VALUES(col1,col2,col3,col4,col5)
 
 HINT: you might need to search for strfrtime modifers sqlite on the web to know what the modifers for month 
 and year are! */
+SELECT customer_id, strftime ('%m', market_date) AS month, strftime ('%Y', market_date) AS year
+from customer_purchases;
 
 /* 2. Using the previous query as a base, determine how much money each customer spent in April 2022. 
 Remember that money spent is quantity*cost_to_customer_per_qty. 
@@ -38,3 +58,7 @@ Remember that money spent is quantity*cost_to_customer_per_qty.
 HINTS: you will need to AGGREGATE, GROUP BY, and filter...
 but remember, STRFTIME returns a STRING for your WHERE statement!! */
 
+SELECT customer_id, strftime ('%m', market_date) AS month, strftime ('%Y', market_date) AS year, SUM(quantity*cost_to_customer_per_qty) AS money_spent
+from customer_purchases
+WHERE strftime('%Y%m', market_date) = '202204'
+GROUP BY customer_id, month, year;
