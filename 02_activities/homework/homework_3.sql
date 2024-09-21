@@ -35,7 +35,7 @@ VALUES(col1,col2,col3,col4,col5)
 */
 DROP TABLE if EXISTS temp.new_vendor;
 -- step 1
-CREATE TABLE temp.new_vendor AS
+CREATE TEMPORARY TABLE temp.new_vendor AS
 SELECT * FROM vendor;
 -- step 2
 INSERT INTO new_vendor
